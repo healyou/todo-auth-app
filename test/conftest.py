@@ -1,11 +1,10 @@
-from main.auth_controller import create_app
+from main.app.create_flask_app import create_app
 import pytest
-from flask import Flask
 
 
 @pytest.fixture
 def app():
-    app = create_app(Flask('test_app'))
+    app = create_app('test_app')
     return app
 
 
