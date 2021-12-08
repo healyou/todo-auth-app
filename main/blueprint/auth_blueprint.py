@@ -103,7 +103,6 @@ def refresh_token():
 
 @auth.route('/logout', methods=['POST'])
 def logout():
-    # TODO тесты на функциональность
     token = None
     # jwt is passed in the request header
     if 'X-Access-Token' in request.headers:
