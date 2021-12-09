@@ -16,6 +16,9 @@ class TokenRepository:
     def __init__(self):
         pass
 
+    # TODO redis для хранение заблоченных рефреш токенов
+    # только операции logout and refresh
+    # TODO https://flask-jwt-extended.readthedocs.io/en/stable/blocklist_and_token_revoking/ flask jwt
     def save_user_tokens(self, user_token):
         self.tokens[user_token.user_id] = user_token
 
