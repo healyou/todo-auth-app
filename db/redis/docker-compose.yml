@@ -15,5 +15,5 @@ services:
       test: ["CMD", "redis-cli","-a","redis","ping"]
       interval: 1s
       timeout: 3s
-      retries: 3
+      retries: 30
       start_period: 5s
