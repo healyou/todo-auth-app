@@ -4,5 +4,5 @@ python-dotenv==0.19.2
 bcrypt==3.2.0
 pytest==6.2.5
 pytest-flask==1.2.0
-pymongo==4.0.1
 redis==4.0.2
+pytz==2021.3

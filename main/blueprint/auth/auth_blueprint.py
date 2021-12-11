@@ -6,7 +6,7 @@ from main.repo.user_repo import UserRepository
 from main.provider.hash_provider import HashProvider
 from main.blueprint.auth.request_support import *
 import jwt
-
+# TODO - логирование
 
 def create_blueprint() -> Blueprint:
     auth_bp = Blueprint('auth', __name__)
@@ -49,13 +49,13 @@ def create_blueprint() -> Blueprint:
                 if not token_repository.has_active_refresh_token(user_refresh_token):
                     return refresh_token_blocked_401()
 
-                new_access_token = jwt_provider.encode_access_token(username)
+                new_access_token, expire_datetime = jwt_provider.encode_access_token(username)
                 new_user_refresh_token = jwt_provider.encode_refresh_token(username)
 
                 token_repository.remove_refresh_token(user_refresh_token)
                 token_repository.add_refresh_token(new_user_refresh_token)
 
-                return token_info_201(new_access_token, new_user_refresh_token)
+                return token_info_201(new_access_token, expire_datetime, new_user_refresh_token)
             except jwt.ExpiredSignatureError:
                 return token_expired_401()
             except jwt.InvalidTokenError:
@@ -108,11 +108,11 @@ def create_blueprint() -> Blueprint:
                 return not_valid_login_401()
 
             if hash_provider.check_psw(password, user.psw_hash):
-                access_token = jwt_provider.encode_access_token(user.public_id)
+                access_token, expire_datetime = jwt_provider.encode_access_token(user.public_id)
                 refresh_token = jwt_provider.encode_refresh_token(user.public_id)
 
                 token_repository.add_refresh_token(refresh_token)
-                return token_info_201(access_token, refresh_token)
+                return token_info_201(access_token, expire_datetime, refresh_token)
             else:
                 return not_valid_login_401()
         except Exception:

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import datetime
+
 from flask import request, jsonify, make_response
 
 
@@ -44,11 +46,11 @@ def refresh_token_blocked_401():
     return jsonify({'message': 'Refresh Token is blocked !!'}), 401
 
 
-def token_info_201(access_token, refresh_token):
+def token_info_201(access_token, access_token_expired_time, refresh_token):
     return make_response(
         jsonify({
             'access_token': access_token,
-            # 'access_token_expired_time': access_token_expired_time,
+            'access_token_expired_time_utc': access_token_expired_time.strftime("%m.%d.%Y %H:%M:%S %z"),
             'refresh_token': refresh_token
         }),
         201
