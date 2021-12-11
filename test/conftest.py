@@ -28,8 +28,15 @@ class AuthActions:
             self.login_url, data={'username': username, 'password': password}
         )
 
-    def logout(self, access_token):
-        headers = {'X-Access-Token': access_token}
+    def refresh_token(self, refresh_token):
+        headers = {'X-Refresh-Token': refresh_token}
+        return self._client.post(self.refresh_token_url, headers=headers)
+
+    def logout(self, access_token, refresh_token):
+        headers = {
+            'X-Access-Token': access_token,
+            'X-Refresh-Token': refresh_token
+        }
         return self._client.post(self.logout_url, headers=headers)
 
 

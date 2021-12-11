@@ -1,7 +1,7 @@
+import uuid
 import jwt
 from datetime import datetime, timedelta
 import os
-from dotenv import load_dotenv
 
 
 class JwtProvider:
@@ -14,7 +14,6 @@ class JwtProvider:
 
     def __init__(self):
         # TODO env для dev-qa и других стендов?
-        load_dotenv()
         self.access_token_secret = os.environ.get('access_token_secret')
         self.refresh_token_secret = os.environ.get('refresh_token_secret')
         self.algorithm = os.environ.get('algorithm')
@@ -37,6 +36,7 @@ class JwtProvider:
         return jwt.encode(
             {
                 'username': username,
+                'uuid': uuid.uuid4().__str__(),  # random uuid
                 'exp': refresh_token_expired_time
             },
             self.refresh_token_secret,
@@ -56,3 +56,10 @@ class JwtProvider:
             self.refresh_token_secret,
             algorithms=[self.algorithm]
         )
+
+    def get_username_from_access_or_refresh_token(self, token) -> str:
+        return token['username']
+
+    def get_refresh_token_uuid(self, refresh_token) -> str:
+        data = self.decode_refresh_token(refresh_token)
+        return data['uuid']

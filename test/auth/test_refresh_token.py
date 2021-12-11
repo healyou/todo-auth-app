@@ -22,3 +22,12 @@ def test_get_refresh_token_no_header(client, auth_actions):
     auth_actions.login()
     response = client.post(auth_actions.refresh_token_url)
     assert response.status_code == 401
+
+
+def test_get_refresh_token_double(client, auth_actions):
+    response = auth_actions.login()
+    refresh_token = response.json['refresh_token']
+
+    auth_actions.refresh_token(refresh_token)
+    response = auth_actions.refresh_token(refresh_token)
+    assert response.status_code == 401
