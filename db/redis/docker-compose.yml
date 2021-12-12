@@ -17,3 +17,20 @@ services:
       timeout: 3s
       retries: 30
       start_period: 5s
+
+  redis-commander:
+    container_name: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment:
+      - REDIS_PASSWORD=redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+      - HTTP_USER=redis
+      - HTTP_PASSWORD=redis
+    ports:
+      - 8081:8081
+    depends_on:
+      redis:
+        condition: service_healthy
