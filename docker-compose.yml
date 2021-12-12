@@ -1,0 +1,31 @@
+version: '3.2'
+
+services:
+
+  redis:
+    image: redis:6.2.6-alpine
+    container_name: auth-redis-db
+    command: redis-server --appendonly yes --appendfsync everysec --requirepass redis
+    ports:
+     - 6379:6379
+    restart: always
+    volumes:
+     - ./db/redis/data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli","-a","redis","ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+      start_period: 5s
+
+  auth-app:
+    image: auth-app:v1
+    container_name: auth-app
+    environment:
+      ENV: PROD
+    ports:
+      - 8887:8887
+    restart: always
+    depends_on:
+      redis:
+        condition: service_healthy

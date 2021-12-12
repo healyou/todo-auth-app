@@ -1,12 +1,9 @@
 from __future__ import annotations
-
-import datetime
-
 from flask import request, jsonify, make_response
 
 
 def unsupported_exception_500():
-    return jsonify({'message': 'Unsupported exception'})
+    return jsonify({'message': 'Unsupported exception'}), 500
 
 
 def token_missing_json_401():
