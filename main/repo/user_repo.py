@@ -1,23 +1,29 @@
-class User:
-    id = 1
-    public_id = 11
-    name = "1"
-    email = "1@mail.com"
-    # password = "password"
-    psw_hash = '$2b$10$VYrUvPcb4DuOEOcSgtPlC.8Im3CpXBFU7kFWkvhofnVGVIZaSkEpy'
-
-    def __init__(self):
-        pass
+from __future__ import annotations
+import requests
+import os
 
 
 # TODO начитка юзеров из другого приложения
 class UserRepository:
-    users = {}
+    users_app_url = None
+    #TODO mock in app tests
 
     def __init__(self):
-        user = User()
-        self.users[user.name] = user
+        self.users_app_url = os.environ.get('users_app_url')
 
-    def get_by_username(self, username):
-        return self.users.get(username)
+    def get_user_public_id(self, username) -> int | None:
+        payload_tuples = [('username', username)]
+        r = requests.post(self.users_app_url + '/users/getUserId', data=payload_tuples)
+        if r.status_code == 200 and r.text.isnumeric():
+            return int(r.text)
+        else:
+            return None
+
+    def login(self, username, password) -> bool:
+        payload_tuples = [('username', username), ('password', password)]
+        r = requests.post(self.users_app_url.__str__() + '/users/login', data=payload_tuples)
+        if r.status_code == 200 and r.text == 'true':
+            return True
+        else:
+            return False
 

@@ -3,7 +3,6 @@ from flask import Blueprint
 from main.repo.user_token_repo import TokenRepository
 from main.provider.jwt_provider import JwtProvider
 from main.repo.user_repo import UserRepository
-from main.provider.hash_provider import HashProvider
 from main.blueprint.auth.request_support import *
 import jwt
 # TODO - логирование
@@ -14,7 +13,6 @@ def create_blueprint() -> Blueprint:
     token_repository = TokenRepository()
     jwt_provider = JwtProvider()
     user_repository = UserRepository()
-    hash_provider = HashProvider()
 
     @auth_bp.route('/validateToken', methods=['GET', 'POST'])
     def validate_token():
@@ -102,19 +100,21 @@ def create_blueprint() -> Blueprint:
             elif not username or not password:
                 return no_auth_info_401()
 
-            user = user_repository.get_by_username(username)
+            login = user_repository.login(username, password)
 
-            if not user or user is None:
+            if not login:
                 return not_valid_login_401()
-
-            if hash_provider.check_psw(password, user.psw_hash):
-                access_token, expire_datetime = jwt_provider.encode_access_token(user.public_id)
-                refresh_token = jwt_provider.encode_refresh_token(user.public_id)
-
-                token_repository.add_refresh_token(refresh_token)
-                return token_info_201(access_token, expire_datetime, refresh_token)
             else:
-                return not_valid_login_401()
+                user_public_id = user_repository.get_user_public_id(username)
+
+                if user_public_id:
+                    access_token, expire_datetime = jwt_provider.encode_access_token(user_public_id)
+                    refresh_token = jwt_provider.encode_refresh_token(user_public_id)
+
+                    token_repository.add_refresh_token(refresh_token)
+                    return token_info_201(access_token, expire_datetime, refresh_token)
+                else:
+                    return not_valid_login_401()
         except Exception:
             return unsupported_exception_500()
 

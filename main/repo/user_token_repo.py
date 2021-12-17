@@ -44,7 +44,4 @@ class TokenRepository:
     def remove_refresh_token(self, refresh_token):
         uuid = self.jwt_provider.get_refresh_token_uuid(refresh_token)
         self.redis_db.delete(uuid)
-
-    # TODO redis для хранение заблоченных рефреш токенов
-    # только операции logout and refresh
     # TODO https://flask-jwt-extended.readthedocs.io/en/stable/blocklist_and_token_revoking/ flask jwt
