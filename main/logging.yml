@@ -1,0 +1,21 @@
+version: 1
+formatters:
+  default:
+    format: '%(asctime)s - %(process)s - {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: default
+    stream: ext://sys.stdout
+  file:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: default
+    filename: "{log_path}/auth-app.log"
+    encoding: utf8
+loggers:
+  fileLogger:
+    level: DEBUG
+    handlers: [console, file]
+    propagate: no

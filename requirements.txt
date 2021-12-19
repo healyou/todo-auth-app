@@ -7,3 +7,4 @@ redis==4.0.2
 pytz==2021.3
 waitress==2.0.0
 requests==2.26.0
+PyYAML==6.0
