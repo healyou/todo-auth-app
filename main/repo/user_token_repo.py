@@ -1,27 +1,29 @@
+from __future__ import annotations
 import redis
 import os
 from datetime import timedelta
 from main.provider.jwt_provider import JwtProvider
 import logging
+import threading
 
 
-class UserToken:
-    user_id = None
-    access_token = None
-    refresh_token = None
-
-    def __init__(self, user_id, access_token, refresh_token):
-        self.user_id = user_id
-        self.access_token = access_token
-        self.refresh_token = refresh_token
-
-
-class TokenRepository:
-    tokens = {}
+class _TokenRepository:
+    _lock = threading.Lock()
     redis_db = None
     refresh_expires = None
     jwt_provider = None
     logger = None
+
+    @staticmethod
+    def get_instance() -> _TokenRepository:
+        return _TokenRepository()
+
+    def __new__(cls):
+        if not hasattr(cls, '_instance'):
+            with cls._lock:
+                if not hasattr(cls, '_instance'):
+                    cls._instance = super(_TokenRepository, cls).__new__(cls)
+        return cls._instance
 
     def __init__(self):
         self.redis_db = redis.StrictRedis(

@@ -2,13 +2,25 @@ from __future__ import annotations
 import requests
 import os
 import logging
+import threading
 
 
-# TODO начитка юзеров из другого приложения
-class UserRepository:
+class _UserRepository:
+    _lock = threading.Lock()
     users_app_url = None
     logger = None
     #TODO mock in app tests
+
+    @staticmethod
+    def get_instance() -> _UserRepository:
+        return _UserRepository()
+
+    def __new__(cls):
+        if not hasattr(cls, '_instance'):
+            with cls._lock:
+                if not hasattr(cls, '_instance'):
+                    cls._instance = super(_UserRepository, cls).__new__(cls)
+        return cls._instance
 
     def __init__(self):
         self.users_app_url = os.environ.get('users_app_url')
@@ -36,4 +48,3 @@ class UserRepository:
                 return False
         else:
             return False
-

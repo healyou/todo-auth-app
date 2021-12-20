@@ -1,19 +1,19 @@
 from __future__ import annotations
 from flask import Blueprint
-from main.repo.user_token_repo import TokenRepository
 from main.provider.jwt_provider import JwtProvider
-from main.repo.user_repo import UserRepository
 from main.blueprint.auth.request_support import *
 import jwt
 import logging
+import main.repo.repo_creator as repo_creator
 
 
 def create_blueprint() -> Blueprint:
     auth_bp = Blueprint('auth', __name__)
 
-    token_repository = TokenRepository()
+    # from main.repo.repo_creator import get_user_repo, get_user_token_repo
+    token_repository = repo_creator.get_user_token_repo()
+    user_repository = repo_creator.get_user_repo()
     jwt_provider = JwtProvider()
-    user_repository = UserRepository()
     logger = logging.getLogger('fileLogger')
 
     @auth_bp.route('/validateToken', methods=['GET', 'POST'])

@@ -8,7 +8,6 @@ import pytz
 
 
 class JwtProvider:
-    # TODO грузить ключи безопасно
     access_token_secret = None
     refresh_token_secret = None
     algorithm = None
@@ -16,7 +15,6 @@ class JwtProvider:
     refresh_token_time_minutes = None
 
     def __init__(self):
-        # TODO env для dev-qa и других стендов?
         self.access_token_secret = os.environ.get('access_token_secret')
         self.refresh_token_secret = os.environ.get('refresh_token_secret')
         self.algorithm = os.environ.get('algorithm')

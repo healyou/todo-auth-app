@@ -6,7 +6,7 @@ def test_login_successful(client, auth_actions):
 
 
 def test_login_incorrect_data(client, auth_actions):
-    response = auth_actions.login('error', 'error')
+    response = auth_actions.login(auth_actions.error_login, auth_actions.error_login)
     assert response.status_code == 401
 
 
