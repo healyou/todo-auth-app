@@ -9,7 +9,6 @@ class _UserRepository:
     _lock = threading.Lock()
     users_app_url = None
     logger = None
-    #TODO mock in app tests
 
     @staticmethod
     def get_instance() -> _UserRepository:
