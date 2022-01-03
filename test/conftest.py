@@ -27,6 +27,15 @@ def mock_repo(session_mocker):
             'main.repo.repo_creator.get_user_repo',
             return_value=mock_repo_user
         )
+    elif 'ENV' in os.environ and os.environ['ENV'] == 'INTEGRATION_TEST':
+        mock_repo_user = mock_user_repo(session_mocker)
+        session_mocker.patch(
+            'main.repo.repo_creator.get_user_repo',
+            return_value=mock_repo_user
+        )
+    else:
+        # все сервисы должны быть запущены (redis + users-app)
+        pass
 
 
 def mock_user_repo(session_mocker):
