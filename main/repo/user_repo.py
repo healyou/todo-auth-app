@@ -1,8 +1,11 @@
 from __future__ import annotations
+
+import json
 import requests
 import os
 import logging
 import threading
+from main.entity.users_app import UserData
 
 
 class _UserRepository:
@@ -32,7 +35,18 @@ class _UserRepository:
         if r.status_code == 200 and r.text.isnumeric():
             return int(r.text)
         else:
-            self.logger.warning(r)
+            self.logger.error(r)
+            return None
+
+    def get_user_data(self, username) -> UserData | None:
+        payload_tuples = [('username', username)]
+        r = requests.post(self.users_app_url + '/users/getUserData', data=payload_tuples)
+
+        if r.status_code == 200 and r.text:
+            obj = json.loads(r.text)
+            return UserData(obj["userId"], obj["privilegeCodes"])
+        else:
+            self.logger.error(r)
             return None
 
     def login(self, username, password) -> bool:

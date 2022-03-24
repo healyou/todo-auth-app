@@ -1,8 +1,11 @@
+import logging
 import os
 
 import pytest
 
 from main.app.create_flask_app import create_app
+from main.provider.jwt_provider import JwtProvider
+from main.entity.users_app import UserData
 
 
 ERROR_LOGIN_NAME = 'error'
@@ -48,10 +51,14 @@ def mock_user_repo(session_mocker):
         else:
             return True
 
+    user_id = 1
+    privileges = ["test"]
+    user_data = UserData(user_id, privileges)
     mock.configure_mock(
         **{
             "get_instance.return_value": mock,
-            "get_user_public_id.return_value": 1,
+            "get_user_public_id.return_value": user_id,
+            "get_user_data.return_value": user_data,
             "login.side_effect": mock_login
         }
     )
@@ -113,3 +120,8 @@ class AuthActions:
 @pytest.fixture
 def auth_actions(client):
     return AuthActions(client)
+
+
+@pytest.fixture
+def jwt_provider():
+    return JwtProvider()

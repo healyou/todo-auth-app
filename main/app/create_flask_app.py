@@ -14,6 +14,10 @@ def create_app(name):
     logger = logging.getLogger('fileLogger')
     logger.debug('Инициализация auth-app version=' + os.environ['version'])
     logger.debug('Инициализация flask')
+    if 'ENV' in os.environ:
+        logger.debug('Используется профиль - \'' + os.environ['ENV'] + '\'')
+    else:
+        logger.debug('Используется профиль для разработки')
 
     try:
         flask_app = Flask(name)

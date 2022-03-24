@@ -1,6 +1,7 @@
 from __future__ import annotations
 from flask import Blueprint
 from main.provider.jwt_provider import JwtProvider
+from main.entity.users_app import UserData
 from main.blueprint.auth.request_support import *
 import jwt
 import logging
@@ -51,13 +52,14 @@ def create_blueprint() -> Blueprint:
             try:
                 data = jwt_provider.decode_refresh_token(user_refresh_token)
                 username = jwt_provider.get_username_from_access_or_refresh_token(data)
+                userdata = jwt_provider.get_userdata_from_access_or_refresh_token(data)
 
                 if not token_repository.has_active_refresh_token(user_refresh_token):
                     logger.debug('refresh token blocked on refreshToken')
                     return refresh_token_blocked_401()
 
-                new_access_token, expire_datetime = jwt_provider.encode_access_token(username)
-                new_user_refresh_token = jwt_provider.encode_refresh_token(username)
+                new_access_token, expire_datetime = jwt_provider.encode_access_token(username, userdata)
+                new_user_refresh_token = jwt_provider.encode_refresh_token(username, userdata)
 
                 token_repository.remove_refresh_token(user_refresh_token)
                 token_repository.add_refresh_token(new_user_refresh_token)
@@ -127,11 +129,12 @@ def create_blueprint() -> Blueprint:
                 logger.warning('no find user on login')
                 return not_valid_login_401()
             else:
-                user_public_id = user_repository.get_user_public_id(username)
+                user_data: UserData = user_repository.get_user_data(username)
 
-                if user_public_id:
-                    access_token, expire_datetime = jwt_provider.encode_access_token(user_public_id)
-                    refresh_token = jwt_provider.encode_refresh_token(user_public_id)
+                if user_data and user_data.userId:
+                    user_public_id = user_data.userId
+                    access_token, expire_datetime = jwt_provider.encode_access_token(user_public_id, user_data)
+                    refresh_token = jwt_provider.encode_refresh_token(user_public_id, user_data)
 
                     token_repository.add_refresh_token(refresh_token)
                     return token_info_201(access_token, expire_datetime, refresh_token)
