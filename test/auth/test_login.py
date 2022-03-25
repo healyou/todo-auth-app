@@ -1,8 +1,11 @@
+from main.app import const
+
+
 def test_login_successful(client, auth_actions):
     response = auth_actions.login()
     assert response.status_code == 201
-    assert response.json['access_token']
-    assert response.json['refresh_token']
+    assert response.json[const.JSON_OUT_ACCESS_TOKEN_CODE]
+    assert response.json[const.JSON_OUT_REFRESH_TOKEN_CODE]
 
 
 def test_login_incorrect_data(client, auth_actions):

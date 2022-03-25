@@ -1,10 +1,14 @@
 from __future__ import annotations
-import redis
-import os
-from datetime import timedelta
-from main.provider.jwt_provider import JwtProvider
+
 import logging
+import os
 import threading
+from datetime import timedelta
+
+import redis
+
+from main.app import const
+from main.provider.jwt_provider import JwtProvider
 
 
 class _TokenRepository:
@@ -27,16 +31,16 @@ class _TokenRepository:
 
     def __init__(self):
         self.redis_db = redis.StrictRedis(
-            host=os.environ.get('redis_host'),
-            port=int(os.environ.get('redis_port')),
-            db=int(os.environ.get('redis_db_number')),
-            password=os.environ.get('redis_password'),
+            host=os.environ.get(const.ENV_REDIS_HOST_PARAM_CODE),
+            port=int(os.environ.get(const.ENV_REDIS_PORT_PARAM_CODE)),
+            db=int(os.environ.get(const.ENV_REDIS_DB_NUMBER_PARAM_CODE)),
+            password=os.environ.get(const.ENV_REDIS_PASSWORD_PARAM_CODE),
             decode_responses=True
         )
-        refresh_token_time_minutes = int(os.environ.get('refresh_token_time_minutes'))
+        refresh_token_time_minutes = int(os.environ.get(const.ENV_REFRESH_TOKEN_TIME_PARAM_CODE))
         self.refresh_expires = timedelta(minutes=refresh_token_time_minutes)
         self.jwt_provider = JwtProvider()
-        self.logger = logging.getLogger('fileLogger')
+        self.logger = logging.getLogger(const.FILE_LOGGER_PARAM_CODE)
 
     def add_refresh_token(self, refresh_token):
         try:

@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from main.entity.users_app import UserData
 import os
 import pytz
+from main.app import const
 
 
 class JwtProvider:
@@ -16,20 +17,20 @@ class JwtProvider:
     refresh_token_time_minutes = None
 
     def __init__(self):
-        self.access_token_secret = os.environ.get('access_token_secret')
-        self.refresh_token_secret = os.environ.get('refresh_token_secret')
-        self.algorithm = os.environ.get('algorithm')
-        self.access_token_time_minutes = int(os.environ.get('access_token_time_minutes'))
-        self.refresh_token_time_minutes = int(os.environ.get('refresh_token_time_minutes'))
+        self.access_token_secret = os.environ.get(const.ENV_ACCESS_TOKEN_SECRET_PARAM_CODE)
+        self.refresh_token_secret = os.environ.get(const.ENV_REFRESH_TOKEN_SECRET_PARAM_CODE)
+        self.algorithm = os.environ.get(const.ENV_ALGORITHM_PARAM_CODE)
+        self.access_token_time_minutes = int(os.environ.get(const.ENV_ACCESS_TOKEN_TIME_PARAM_CODE))
+        self.refresh_token_time_minutes = int(os.environ.get(const.ENV_REFRESH_TOKEN_TIME_PARAM_CODE))
 
     def encode_access_token(self, username, userdata: UserData) -> Tuple[str, datetime]:
         access_token_expired_time = datetime.utcnow() + timedelta(minutes=self.access_token_time_minutes)
         return jwt.encode(
             {
-                'username': username,
-                'user_id': userdata.userId,
-                'privileges': userdata.privileges,
-                'exp': access_token_expired_time
+                const.TOKEN_USERNAME_PAYLOAD_PARAM_CODE: username,
+                const.TOKEN_USER_ID_PAYLOAD_PARAM_CODE: userdata.userId,
+                const.TOKEN_PRIVILEGES_PAYLOAD_PARAM_CODE: userdata.privileges,
+                const.TOKEN_EXP_PAYLOAD_PARAM_CODE: access_token_expired_time
             },
             self.access_token_secret,
             algorithm=self.algorithm
@@ -39,11 +40,11 @@ class JwtProvider:
         refresh_token_expired_time = datetime.utcnow() + timedelta(minutes=self.refresh_token_time_minutes)
         return jwt.encode(
             {
-                'username': username,
-                'user_id': userdata.userId,
-                'privileges': userdata.privileges,
-                'uuid': uuid.uuid4().__str__(),  # random uuid
-                'exp': refresh_token_expired_time
+                const.TOKEN_USERNAME_PAYLOAD_PARAM_CODE: username,
+                const.TOKEN_USER_ID_PAYLOAD_PARAM_CODE: userdata.userId,
+                const.TOKEN_PRIVILEGES_PAYLOAD_PARAM_CODE: userdata.privileges,
+                const.TOKEN_UUID_PAYLOAD_PARAM_CODE: uuid.uuid4().__str__(),  # random uuid
+                const.TOKEN_EXP_PAYLOAD_PARAM_CODE: refresh_token_expired_time
             },
             self.refresh_token_secret,
             algorithm=self.algorithm
@@ -63,12 +64,17 @@ class JwtProvider:
             algorithms=[self.algorithm]
         )
 
-    def get_username_from_access_or_refresh_token(self, token_payload) -> str:
-        return token_payload['username']
+    @staticmethod
+    def get_username_from_access_or_refresh_token(token_payload) -> str:
+        return token_payload[const.TOKEN_USERNAME_PAYLOAD_PARAM_CODE]
 
-    def get_userdata_from_access_or_refresh_token(self, token_payload) -> UserData:
-        return UserData(token_payload['user_id'], token_payload['privileges'])
+    @staticmethod
+    def get_userdata_from_access_or_refresh_token(token_payload) -> UserData:
+        return UserData(
+            token_payload[const.TOKEN_USER_ID_PAYLOAD_PARAM_CODE],
+            token_payload[const.TOKEN_PRIVILEGES_PAYLOAD_PARAM_CODE]
+        )
 
     def get_refresh_token_uuid(self, refresh_token) -> str:
         data = self.decode_refresh_token(refresh_token)
-        return data['uuid']
+        return data[const.TOKEN_UUID_PAYLOAD_PARAM_CODE]

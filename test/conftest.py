@@ -1,14 +1,16 @@
-import logging
 import os
+import uuid
 
 import pytest
 
+from main.app import const
 from main.app.create_flask_app import create_app
-from main.provider.jwt_provider import JwtProvider
 from main.entity.users_app import UserData
+from main.provider.jwt_provider import JwtProvider
 
-
-ERROR_LOGIN_NAME = 'error'
+ERROR_LOGIN_NAME = uuid.uuid4().__str__()
+TEST_LOGIN_USERNAME = 'admin'
+TEST_LOGIN_PASSWORD = 'admin'
 
 
 @pytest.fixture
@@ -19,7 +21,7 @@ def app(mocker):
 
 
 def mock_repo(session_mocker):
-    if 'ENV' in os.environ and os.environ['ENV'] == 'UNIT_TEST':
+    if const.ENV_PROFILE_CODE in os.environ and os.environ[const.ENV_PROFILE_CODE] == const.UNIT_TEST_PROFILE_CODE:
         mock_token_repo = mock_user_token_repo(session_mocker)
         mock_repo_user = mock_user_repo(session_mocker)
         session_mocker.patch(
@@ -30,7 +32,7 @@ def mock_repo(session_mocker):
             'main.repo.repo_creator.get_user_repo',
             return_value=mock_repo_user
         )
-    elif 'ENV' in os.environ and os.environ['ENV'] == 'INTEGRATION_TEST':
+    elif const.ENV_PROFILE_CODE in os.environ and os.environ[const.ENV_PROFILE_CODE] == const.INTEGRATION_TEST_PROFILE_CODE:
         mock_repo_user = mock_user_repo(session_mocker)
         session_mocker.patch(
             'main.repo.repo_creator.get_user_repo',
@@ -91,28 +93,30 @@ def client(app):
 
 
 class AuthActions:
-    login_url = '/auth/login'
-    logout_url = '/auth/logout'
-    refresh_token_url = '/auth/refreshToken'
-    validate_token_url = '/auth/validateToken'
+    login_url = const.AUTH_REST_MAIN_AUTH_PREFIX + const.AUTH_REST_LOGIN_PREFIX
+    logout_url = const.AUTH_REST_MAIN_AUTH_PREFIX + const.AUTH_REST_LOGOUT_PREFIX
+    refresh_token_url = const.AUTH_REST_MAIN_AUTH_PREFIX + const.AUTH_REST_REFRESH_TOKEN_PREFIX
+    validate_token_url = const.AUTH_REST_MAIN_AUTH_PREFIX + const.AUTH_REST_VALIDATE_TOKEN_PREFIX
     error_login = ERROR_LOGIN_NAME
 
     def __init__(self, client):
         self._client = client
 
-    def login(self, username='admin', password='admin'):
+    def login(self, username=TEST_LOGIN_USERNAME, password=TEST_LOGIN_PASSWORD):
         return self._client.post(
-            self.login_url, data={'username': username, 'password': password}
+            self.login_url, data={
+                const.USERS_APP_REST_USERNAME_HEADER_CODE: username, const.USERS_APP_REST_PASSWORD_HEADER_CODE: password
+            }
         )
 
     def refresh_token(self, refresh_token):
-        headers = {'X-Refresh-Token': refresh_token}
+        headers = {const.JSON_IN_REFRESH_TOKEN_CODE: refresh_token}
         return self._client.post(self.refresh_token_url, headers=headers)
 
     def logout(self, access_token, refresh_token):
         headers = {
-            'X-Access-Token': access_token,
-            'X-Refresh-Token': refresh_token
+            const.JSON_IN_ACCESS_TOKEN_CODE: access_token,
+            const.JSON_IN_REFRESH_TOKEN_CODE: refresh_token
         }
         return self._client.post(self.logout_url, headers=headers)
 

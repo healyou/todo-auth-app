@@ -1,17 +1,20 @@
+from main.app import const
+
+
 def test_validate_login_on_access_token(client, auth_actions):
     response = auth_actions.login()
-    access_token = response.json['access_token']
+    access_token = response.json[const.JSON_OUT_ACCESS_TOKEN_CODE]
 
-    headers = {'X-Access-Token': access_token}
+    headers = {const.JSON_IN_ACCESS_TOKEN_CODE: access_token}
     response = client.post(auth_actions.validate_token_url, headers=headers)
     assert response.status_code == 200
 
 
 def test_validate_login_on_refresh_token(client, auth_actions):
     response = auth_actions.login()
-    refresh_token = response.json['refresh_token']
+    refresh_token = response.json[const.JSON_OUT_REFRESH_TOKEN_CODE]
 
-    headers = {'X-Access-Token': refresh_token}
+    headers = {const.JSON_IN_ACCESS_TOKEN_CODE: refresh_token}
     response = client.post(auth_actions.validate_token_url, headers=headers)
     assert response.status_code == 401
 

@@ -1,11 +1,14 @@
 from __future__ import annotations
-from flask import Blueprint
-from main.provider.jwt_provider import JwtProvider
-from main.entity.users_app import UserData
-from main.blueprint.auth.request_support import *
-import jwt
+
 import logging
+
+import jwt
+from flask import Blueprint
+
 import main.repo.repo_creator as repo_creator
+from main.blueprint.auth.request_support import *
+from main.entity.users_app import UserData
+from main.provider.jwt_provider import JwtProvider
 
 
 def create_blueprint() -> Blueprint:
@@ -15,9 +18,9 @@ def create_blueprint() -> Blueprint:
     token_repository = repo_creator.get_user_token_repo()
     user_repository = repo_creator.get_user_repo()
     jwt_provider = JwtProvider()
-    logger = logging.getLogger('fileLogger')
+    logger = logging.getLogger(const.FILE_LOGGER_PARAM_CODE)
 
-    @auth_bp.route('/validateToken', methods=['GET', 'POST'])
+    @auth_bp.route(const.AUTH_REST_VALIDATE_TOKEN_PREFIX, methods=['GET', 'POST'])
     def validate_token():
         try:
             token = get_access_token_from_header()
@@ -41,7 +44,7 @@ def create_blueprint() -> Blueprint:
             logger.exception('validateToken')
             return unsupported_exception_500()
 
-    @auth_bp.route('/refreshToken', methods=['POST'])
+    @auth_bp.route(const.AUTH_REST_REFRESH_TOKEN_PREFIX, methods=['POST'])
     def refresh_token():
         try:
             user_refresh_token = get_refresh_token_from_header()
@@ -78,7 +81,7 @@ def create_blueprint() -> Blueprint:
             logger.exception('refreshToken')
             return unsupported_exception_500()
 
-    @auth_bp.route('/logout', methods=['POST'])
+    @auth_bp.route(const.AUTH_REST_LOGOUT_PREFIX, methods=['POST'])
     def logout():
         try:
             access_token = get_access_token_from_header()
@@ -109,7 +112,7 @@ def create_blueprint() -> Blueprint:
             logger.exception('logout')
             return unsupported_exception_500()
 
-    @auth_bp.route('/login', methods=['POST'])
+    @auth_bp.route(const.AUTH_REST_LOGIN_PREFIX, methods=['POST'])
     def login():
         try:
             auth = request.form
