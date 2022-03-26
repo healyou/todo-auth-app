@@ -9,8 +9,6 @@ from main.entity.users_app import UserData
 from main.provider.jwt_provider import JwtProvider
 
 ERROR_LOGIN_NAME = uuid.uuid4().__str__()
-TEST_LOGIN_USERNAME = 'admin'
-TEST_LOGIN_PASSWORD = 'admin'
 
 
 @pytest.fixture
@@ -93,6 +91,9 @@ def client(app):
 
 
 class AuthActions:
+    TEST_LOGIN_USERNAME = 'admin'
+    TEST_LOGIN_PASSWORD = 'admin'
+
     login_url = const.AUTH_REST_MAIN_AUTH_PREFIX + const.AUTH_REST_LOGIN_PREFIX
     logout_url = const.AUTH_REST_MAIN_AUTH_PREFIX + const.AUTH_REST_LOGOUT_PREFIX
     refresh_token_url = const.AUTH_REST_MAIN_AUTH_PREFIX + const.AUTH_REST_REFRESH_TOKEN_PREFIX

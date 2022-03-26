@@ -135,9 +135,8 @@ def create_blueprint() -> Blueprint:
                 user_data: UserData = user_repository.get_user_data(username)
 
                 if user_data and user_data.userId:
-                    user_public_id = user_data.userId
-                    access_token, expire_datetime = jwt_provider.encode_access_token(user_public_id, user_data)
-                    refresh_token = jwt_provider.encode_refresh_token(user_public_id, user_data)
+                    access_token, expire_datetime = jwt_provider.encode_access_token(username, user_data)
+                    refresh_token = jwt_provider.encode_refresh_token(username, user_data)
 
                     token_repository.add_refresh_token(refresh_token)
                     return token_info_201(access_token, expire_datetime, refresh_token)
