@@ -12,7 +12,7 @@ from main.provider.jwt_provider import JwtProvider
 
 
 def create_blueprint() -> Blueprint:
-    auth_bp = Blueprint('auth', __name__)
+    auth_bp = Blueprint('auth-api-blueprint', __name__)
 
     # from main.repo.repo_creator import get_user_repo, get_user_token_repo
     token_repository = repo_creator.get_user_token_repo()

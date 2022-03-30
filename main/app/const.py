@@ -38,7 +38,7 @@ JSON_IN_ACCESS_TOKEN_CODE = 'X-Access-Token'
 JSON_IN_REFRESH_TOKEN_CODE = 'X-Refresh-Token'
 
 # auth rest path codes
-AUTH_REST_MAIN_AUTH_PREFIX = '/auth'
+AUTH_REST_MAIN_AUTH_PREFIX = '/auth-api'
 AUTH_REST_LOGIN_PREFIX = '/login'
 AUTH_REST_LOGOUT_PREFIX = '/logout'
 AUTH_REST_REFRESH_TOKEN_PREFIX = '/refreshToken'
