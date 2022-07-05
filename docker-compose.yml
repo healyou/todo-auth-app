@@ -20,7 +20,7 @@ services:
 
   redis-commander:
     container_name: redis-commander
-    image: rediscommander/redis-commander:latest
+    image: rediscommander/redis-commander:redis-commander-210
     restart: always
     environment:
       - REDIS_PASSWORD=redis
